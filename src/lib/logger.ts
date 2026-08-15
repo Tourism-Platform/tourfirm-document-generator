@@ -11,6 +11,8 @@ export interface ILogFields {
   errorCategory?: string;
   statusCode?: number;
   errorMessage?: string;
+  errorName?: string;
+  errorStack?: string;
 }
 
 export function log(fields: ILogFields): void {

@@ -20,7 +20,7 @@ export interface IGenerateInvoiceMockResult {
 }
 
 export interface IGenerateInvoiceMockDependencies {
-  generatePdf: (html: string) => Promise<Buffer>;
+  generatePdf: (html: string, requestId?: string) => Promise<Buffer>;
   savePdfLocal: (filename: string, pdf: Buffer) => Promise<string>;
 }
 
@@ -56,7 +56,7 @@ export async function generateInvoiceMock(
   const html = renderInvoiceHtml(invoiceData);
 
   const pdfStartedAt = Date.now();
-  const pdf = await dependencies.generatePdf(html);
+  const pdf = await dependencies.generatePdf(html, requestId);
   const pdfGenerationDurationMs = Date.now() - pdfStartedAt;
 
   log({

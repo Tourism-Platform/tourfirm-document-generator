@@ -79,7 +79,7 @@ export async function generateInvoice(
   const html = renderInvoiceHtml(invoiceData);
 
   const pdfStartedAt = Date.now();
-  const pdf = await generatePdf(html);
+  const pdf = await generatePdf(html, requestId);
   const pdfGenerationDurationMs = Date.now() - pdfStartedAt;
 
   log({

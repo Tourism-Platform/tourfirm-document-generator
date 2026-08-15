@@ -1,6 +1,7 @@
 import { getExo2FontFaceCss } from "@/lib/invoice/exo2-font-face";
 import type { Browser } from "playwright-core";
 import { PdfGenerationError } from "@/lib/errors/document-errors";
+import { log } from "@/lib/logger";
 import { launchBrowser } from "./launch-browser";
 
 function getPdfFooterTemplate(): string {
@@ -12,14 +13,50 @@ function getPdfFooterTemplate(): string {
   `;
 }
 
-export async function generatePdf(html: string): Promise<Buffer> {
+function toErrorFields(error: unknown): {
+  errorName?: string;
+  errorMessage?: string;
+  errorStack?: string;
+} {
+  if (!(error instanceof Error)) {
+    return {
+      errorName: "UnknownError",
+      errorMessage: "Unknown error",
+    };
+  }
+
+  return {
+    errorName: error.name,
+    errorMessage: error.message,
+    errorStack: error.stack,
+  };
+}
+
+export async function generatePdf(html: string, requestId?: string): Promise<Buffer> {
   let browser: Browser | undefined;
 
   try {
+    log({
+      event: "chromium_launch_started",
+      requestId,
+    });
     browser = await launchBrowser();
+    log({
+      event: "chromium_launch_success",
+      requestId,
+    });
+
+    log({
+      event: "pdf_page_started",
+      requestId,
+    });
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: "load" });
     await page.emulateMedia({ media: "print" });
+    log({
+      event: "pdf_page_success",
+      requestId,
+    });
 
     const pdf = await page.pdf({
       format: "A4",
@@ -36,11 +73,24 @@ export async function generatePdf(html: string): Promise<Buffer> {
       },
     });
 
+    log({
+      event: "pdf_generated",
+      requestId,
+    });
+
     return Buffer.from(pdf);
   } catch (error) {
     if (error instanceof PdfGenerationError) {
       throw error;
     }
+
+    log({
+      event: "pdf_generation_failed",
+      requestId,
+      errorCategory: "pdf_generation",
+      statusCode: 500,
+      ...toErrorFields(error),
+    });
 
     throw new PdfGenerationError("Failed to generate PDF document");
   } finally {
