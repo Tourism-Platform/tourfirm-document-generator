@@ -38,6 +38,7 @@ function toErrorResponse(error: unknown, request: Request): NextResponse {
     event: "request_failed",
     errorCategory: "unexpected",
     statusCode: 500,
+    errorMessage: error instanceof Error ? error.message : "Unknown error",
   });
 
   return jsonError(500, request);

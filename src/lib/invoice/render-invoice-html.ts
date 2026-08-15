@@ -8,9 +8,23 @@ interface IReactDomServer {
 }
 
 function getRenderToStaticMarkup(): IReactDomServer["renderToStaticMarkup"] {
-  const require = createRequire(process.cwd() + "/package.json");
-  const reactDomServer = require("react-dom/server") as IReactDomServer;
-  return reactDomServer.renderToStaticMarkup;
+  const loaders = [
+    () => createRequire(import.meta.url)("react-dom/server") as IReactDomServer,
+    () =>
+      createRequire(`${process.cwd()}/package.json`)(
+        "react-dom/server",
+      ) as IReactDomServer,
+  ];
+
+  for (const load of loaders) {
+    try {
+      return load().renderToStaticMarkup;
+    } catch {
+      // try the next loader
+    }
+  }
+
+  throw new Error("react-dom/server is not available");
 }
 
 function escapeHtml(value: string): string {

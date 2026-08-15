@@ -10,6 +10,7 @@ export interface ILogFields {
   documentId?: string;
   errorCategory?: string;
   statusCode?: number;
+  errorMessage?: string;
 }
 
 export function log(fields: ILogFields): void {

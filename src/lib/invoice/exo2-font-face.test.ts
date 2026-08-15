@@ -11,4 +11,8 @@ describe("getExo2FontFaceCss", () => {
     expect(css).toContain("unicode-range: U+0000-00FF");
     expect(css).toContain("unicode-range: U+0301, U+0400-045F");
   });
+
+  it("does not throw when embedding fonts", () => {
+    expect(() => getExo2FontFaceCss()).not.toThrow();
+  });
 });
