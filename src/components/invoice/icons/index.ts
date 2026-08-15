@@ -1,0 +1,10 @@
+export { BoxOutlineIcon } from "./box-outline";
+export { BusIcon } from "./bus";
+export { DrivingIcon } from "./driving";
+export { HouseIcon } from "./house";
+export { InfoCircleIcon } from "./info-circle";
+export { PlaneIcon } from "./plane";
+export { TaskSquareIcon } from "./task-square";
+export { TicketStarIcon } from "./ticket-star";
+export { TrainIcon } from "./train";
+export { UsersIcon } from "./users";
