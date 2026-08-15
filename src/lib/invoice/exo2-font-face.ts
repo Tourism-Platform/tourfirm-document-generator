@@ -1,6 +1,5 @@
-import { createRequire } from "node:module";
-import { readFileSync } from "node:fs";
-import { pathToFileURL } from "node:url";
+import { existsSync, readFileSync } from "node:fs";
+import path from "node:path";
 
 const LATIN_UNICODE_RANGE =
   "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD";
@@ -14,28 +13,17 @@ const SUBSETS: Array<{ name: string; unicodeRange: string }> = [
 
 const cache = new Map<string, string>();
 
-function resolveWoff2Path(fileName: string): string | null {
-  const spec = `@fontsource/exo-2/files/${fileName}`;
-  const resolvers = [
-    () => createRequire(import.meta.url).resolve(spec),
-    () => createRequire(pathToFileURL(`${process.cwd()}/package.json`).href).resolve(spec),
-  ];
-
-  for (const resolve of resolvers) {
-    try {
-      return resolve();
-    } catch {
-      // try the next resolver
-    }
-  }
-
-  return null;
-}
-
 function readWoff2Base64(fileName: string): string | null {
-  const filePath = resolveWoff2Path(fileName);
+  const filePath = path.join(
+    process.cwd(),
+    "node_modules",
+    "@fontsource",
+    "exo-2",
+    "files",
+    fileName,
+  );
 
-  if (!filePath) {
+  if (!existsSync(filePath)) {
     return null;
   }
 
